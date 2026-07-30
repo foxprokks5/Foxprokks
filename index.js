@@ -5,7 +5,16 @@ const {
 } = require("discord.js");
 require("dotenv").config();
 const fs = require('fs');
+const express = require('express');
 
+// SERVIDOR EXPRESS PARA O RENDER RECONHECER A PORTA
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+app.get('/', (req, res) => res.send('🦊 FoxProkks | ONLINE E FUNCIONANDO!'));
+app.listen(PORT, () => console.log(`✅ Servidor rodando na porta ${PORT}`));
+
+// INICIALIZAÇÃO DO BOT
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -42,10 +51,10 @@ const salvarXP = () => fs.writeFileSync('./xp.json', JSON.stringify(xpDados, nul
 client.once("ready", () => console.log(`✅ 🦊 ${client.user.tag} | FOX-PLAY ONLINE!`));
 
 // ==============================================
-// 📢 MENSAGENS AUTOMÁTICAS NOS CANAIS
+// 📢 COMANDOS E SISTEMAS AUTOMÁTICOS
 // ==============================================
 client.on("messageCreate", async (msg) => {
-    if(msg.author.bot) return;
+    if(msg.author.bot || !msg.guild) return;
 
     // 🎯 CANAL CARGOS
     if(msg.channel.id === CONFIG.canais.cargos && msg.content.toLowerCase() === '!painel' && msg.author.id === CONFIG.seuId){
@@ -85,7 +94,7 @@ client.on("messageCreate", async (msg) => {
 
     // 🎁 CANAL SORTEIO
     if(msg.channel.id === CONFIG.canais.sorteio && msg.content.toLowerCase().startsWith('!sorteio') && msg.author.id === CONFIG.seuId){
-        const premio = msg.content.slice(9) || "Prêmio surpresa!";
+        const premio = msg.content.slice(9).trim() || "Prêmio surpresa!";
         const emb = new EmbedBuilder()
         .setColor('#FFD700')
         .setTitle('🎁 NOVO SORTEIO!')
@@ -170,4 +179,6 @@ client.on("interactionCreate", async (inter) => {
     }
 });
 
+// LOGIN DO BOT — POR ÚLTIMO SEMPRE
 client.login(process.env.TOKEN);
+          
